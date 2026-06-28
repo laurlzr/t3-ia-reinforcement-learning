@@ -44,6 +44,10 @@ class QLearningAgent(ReinforcementAgent):
 
         "*** YOUR CODE HERE ***"
 
+        # O counter abstrai logica
+        # que precisaria fazer na mao
+        self.q_values = util.Counter()
+
     def getQValue(self, state, action):
         """
           Returns Q(state,action)
@@ -51,7 +55,13 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # Essa nao é a implementacao final (eu acho),
+        # pelo que diz no pdf tem que mexer pra questão extra
+        #
+        # Aqui eh o negocio do counter, nao precisa
+        # verificar se existe o valor ou nao
+        return self.q_values[(state, action)]
 
 
     def computeValueFromQValues(self, state):
@@ -62,7 +72,13 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        actions = self.getLegalActions(state)
+
+        if not actions:
+            return 0.0
+
+        return max(self.getQValue(state, a) for a in actions)
 
     def computeActionFromQValues(self, state):
         """
@@ -71,7 +87,23 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        actions = self.getLegalActions(state)
+
+        if not actions:
+            return None
+
+        best_value = self.computeValueFromQValues(state)
+
+        best_actions = []
+        for action in actions:
+            if self.getQValue(state, action) == best_value:
+                best_actions.append(action)
+
+        # Aqui tambem diz no pdf que
+        # esse eh o "criterio de desempate"
+        return random.choice(best_actions)
+
 
     def getAction(self, state):
         """
@@ -85,10 +117,17 @@ class QLearningAgent(ReinforcementAgent):
           HINT: To pick randomly from a list, use random.choice(list)
         """
         # Pick Action
-        legalActions = self.getLegalActions(state)
+        legal_actions = self.getLegalActions(state)
         action = None
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        if not legal_actions:
+            return None
+
+        if util.flipCoin(self.epsilon):
+            action = random.choice(legal_actions)
+        else:
+            action = self.getPolicy(state)
 
         return action
 
@@ -102,7 +141,13 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        curr_q = self.getQValue(state, action)
+        future_v = self.getValue(nextState)
+
+        # Aqui eh so passar a formula a do Q(s, a) a limpo
+        q_t_plus_one = curr_q + self.alpha * (reward + self.discount * future_v - curr_q)
+
+        self.q_values[(state, action)] = q_t_plus_one
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
