@@ -43,7 +43,34 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.values = util.Counter()  # A Counter is a dict with default 0
 
         # Write value iteration code here
-        "*** YOUR CODE HERE ***"
+        # versão em batch - valores da iteração k são calculados a partir da k-1
+
+        for i in range(self.iterations):
+            # copia os valores novos pra não alterar self.values enquanto ainda estamos calculando
+            newValues = util.Counter() 
+
+            for state in self.mdp.getStates():
+
+                if self.mdp.isTerminal(state):
+                    # se for terminal, não existe ação possível
+                    newValues[state] = 0 
+                    continue
+
+                # coleta as ações possíveis do estado atual
+                actions = self.mdp.getPossibleActions(state)
+
+                if len(actions) == 0:
+                    continue
+
+                qValues = []
+            
+                for action in actions:
+                    qValues.append(self.computeQValueFromValues(state, action))
+                # pega o maior valor de Q (ótimo) dentre todos os calculados para o estado atual
+                newValues[state] = max(qValues)
+
+            # fim do batch - atualiza os valores do agente com os novos valores calculados
+            self.values = newValues
 
 
     def getValue(self, state):
@@ -53,24 +80,49 @@ class ValueIterationAgent(ValueEstimationAgent):
         return self.values[state]
 
     def computeQValueFromValues(self, state, action):
-        """
-          Compute the Q-value of action in state from the
-          value function stored in self.values.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        qValue = 0
+        # recupera as transições possíveis do estado atual e ação
+        transitions = self.mdp.getTransitionStatesAndProbs(state, action)
 
+        for nextState, probability in transitions:
+            # recupera a recompensa da transição do estado atual para o próximo
+            reward = self.mdp.getReward(state, action, nextState)
+            
+            # equação de Bellman 
+            # Q(s,a) = Σ P(s'|s,a) * [R(s,a,s') + γ * V(s')]
+            qValue += probability * (
+                reward + self.discount * self.values[nextState]
+            )
+        return qValue
+
+    
+    
     def computeActionFromValues(self, state):
-        """
-          The policy is the best action in the given state
-          according to the values currently stored in self.values.
+        # escolher a ação com maior Q
 
-          You may break ties any way you see fit.  Note that if
-          there are no legal actions, which is the case at the
-          terminal state, you should return None.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if self.mdp.isTerminal(state):
+            return None
+
+        actions = self.mdp.getPossibleActions(state)
+
+        if len(actions) == 0:
+            return None
+
+        bestAction = None
+        # inicializa o melhor valor como infinito negativo 
+        # garante que qualquer Q calculado será maior
+        bestValue = float("-inf")
+
+        # para evitar o problema do argMax
+        for action in actions:
+
+            qValue = self.computeQValueFromValues(state, action)
+
+            if qValue > bestValue:
+                bestValue = qValue
+                bestAction = action
+
+        return bestAction
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
