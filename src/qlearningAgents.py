@@ -87,7 +87,23 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        actions = self.getLegalActions(state)
+
+        if not actions:
+            return None
+
+        best_value = self.computeValueFromQValues(state)
+
+        best_actions = []
+        for action in actions:
+            if self.getQValue(state, action) == best_value:
+                best_actions.append(action)
+
+        # Aqui tambem diz no pdf que
+        # esse eh o "criterio de desempate"
+        return random.choice(best_actions)
+
 
     def getAction(self, state):
         """
