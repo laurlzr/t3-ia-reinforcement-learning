@@ -44,6 +44,10 @@ class QLearningAgent(ReinforcementAgent):
 
         "*** YOUR CODE HERE ***"
 
+        # O counter abstrai logica
+        # que precisaria fazer na mao
+        self.q_values = util.Counter()
+
     def getQValue(self, state, action):
         """
           Returns Q(state,action)
