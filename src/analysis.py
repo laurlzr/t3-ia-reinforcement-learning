@@ -19,9 +19,28 @@
 # Set the given parameters to obtain the specified policies through
 # value iteration.
 
+""""
+BridgeGrid é um mapa em grade com um estado terminal de baixa recompensa 
+e um estado terminal de alta recompensa separados por uma "ponte" estreita, 
+em cada lado da qual há um abismo de recompensa altamente negativa.
+"""
+
+# alterar só 1 parâmetro
+""" 
+com os valores  
+answerDiscount = 0.9
+answerNoise = 0.2
+
+obs.: o agente não atravessa a ponte, pq tem 20% de chance de cair no abismo
+prefere a opção mais segura (saída próxima) com menor recompensa
+
+solução: reduzir o ruído - assim o agente passa a confiar que realmente vai pra onde quer
+"""
+
+
 def question2():
     answerDiscount = 0.9
-    answerNoise = 0.2
+    answerNoise = 0.0 # agora atravessar a ponte é seguro
     return answerDiscount, answerNoise
 
 if __name__ == '__main__':
