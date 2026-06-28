@@ -55,7 +55,13 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # Essa nao é a implementacao final (eu acho),
+        # pelo que diz no pdf tem que mexer pra questão extra
+        #
+        # Aqui eh o negocio do counter, nao precisa
+        # verificar se existe o valor ou nao
+        return self.q_values[(state, action)]
 
 
     def computeValueFromQValues(self, state):
